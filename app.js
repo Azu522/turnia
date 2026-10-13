@@ -1,5 +1,6 @@
 const KEY = 'fila-turnos-v1';
 const SOUND_KEY = 'fila-turnos-audio-v1';
+const SPOKEN_KEY = 'fila-turnos-last-spoken-v1';
 const initial = {
   next: 26,
   served: 15,
@@ -51,10 +52,12 @@ function speak(text) {
   return true;
 }
 
-function publishAnnouncement(text) {
+function publishAnnouncement(text, { speakHere = false } = {}) {
   data.announcement = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, text };
   lastAnnouncementId = data.announcement.id;
+  if (speakHere) localStorage.setItem(SPOKEN_KEY, data.announcement.id);
   save();
+  if (speakHere) speak(text);
 }
 
 function render() {
@@ -119,19 +122,26 @@ function callNext(counterId) {
   data.current = { ticket: item.ticket, counter: counter.id, customer: item.customer, service: item.service };
   data.activity.unshift({ text: `${item.ticket} · Llamado a Mesa ${counter.id}`, time: timeNow() });
   data.activity = data.activity.slice(0, 12);
-  publishAnnouncement(`Atención, ${item.customer}. Tiene el turno ${item.ticket}. Favor de pasar a la mesa ${counter.id} para ${item.service}.`);
+  publishAnnouncement(`Atención, ${item.customer}. Tiene el turno ${item.ticket}. Favor de pasar a la mesa ${counter.id} para ${item.service}.`, { speakHere: true });
   toast(`${item.customer}, turno ${item.ticket}: favor de pasar a Mesa ${counter.id}`);
 }
 function finish(counterId) {
   const counter = data.counters.find(c => c.id === counterId);
   if (!counter || !counter.ticket) return;
   const ticket = counter.ticket;
+  const finishedCurrent = data.current?.counter === counterId;
   data.activity.unshift({ text: `${ticket} · Atención finalizada`, time: timeNow(), done: true });
   data.activity = data.activity.slice(0, 12);
   data.served++;
   counter.ticket = null; counter.customer = null; counter.service = null;
-  if (data.current?.counter === counterId) data.current = data.counters.find(c => c.ticket) ? { ...data.counters.find(c => c.ticket), counter: data.counters.find(c => c.ticket).id } : null;
-  save(); toast(`Atención de ${ticket} finalizada.`);
+  if (finishedCurrent) data.current = data.counters.find(c => c.ticket) ? { ...data.counters.find(c => c.ticket), counter: data.counters.find(c => c.ticket).id } : null;
+  const nextCurrent = finishedCurrent ? data.current : null;
+  save();
+  const announcement = nextCurrent
+    ? `El turno ${ticket} finalizó en el puesto ${counterId}. Siguiente: ${nextCurrent.customer}, turno ${nextCurrent.ticket}. Favor de pasar al puesto ${nextCurrent.counter}.`
+    : `El turno ${ticket} finalizó en el puesto ${counterId}. El puesto está disponible.`;
+  publishAnnouncement(announcement, { speakHere: true });
+  toast(nextCurrent ? `${nextCurrent.customer}, turno ${nextCurrent.ticket}: puesto ${nextCurrent.counter}` : `Atención de ${ticket} finalizada. Puesto ${counterId} disponible.`);
 }
 function openDialog() { document.getElementById('new-ticket-dialog').showModal(); }
 function renderPublic() {
@@ -180,7 +190,7 @@ window.addEventListener('storage', event => {
     const updated = JSON.parse(event.newValue);
     activeCount = updated.counters.filter(counter => counter.ticket).length;
     const announcement = updated.announcement;
-    const shouldAnnounce = route === 'pantalla' && soundEnabled && announcement?.id && announcement.id !== lastAnnouncementId;
+    const shouldAnnounce = route === 'pantalla' && soundEnabled && announcement?.id && announcement.id !== lastAnnouncementId && localStorage.getItem(SPOKEN_KEY) !== announcement.id;
     data = updated;
     lastAnnouncementId = announcement?.id || lastAnnouncementId;
     render();
