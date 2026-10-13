@@ -1,0 +1,107 @@
+:root{
+  --ink:#35271f;
+  --muted:#927f70;
+  --line:#eadfd3;
+  --plum:#70452f;
+  --violet:#a65d3f;
+  --lime:#edbd72;
+  --coral:#d88761;
+  background:#f7f2eb;
+}
+body{background:#f7f2eb;color:#35271f}
+.topbar{background:#fffaf4;border-color:#eadfd3}
+.brand{color:#38271e}
+.brand-mark{background:#dfa765;color:#422d21}
+.brand-period{color:#b75f3d}
+.nav-item{color:#958678}
+.nav-item.active{color:#70452f}
+.nav-item.active:after{background:#bd704b}
+.online{color:#807264}
+.dot{background:#82905e;box-shadow:0 0 0 3px #edf0e2}
+.date{border-color:#eadfd3;color:#8b7869}
+.avatar{background:#f1d9c3;color:#81543c}
+.eyebrow{color:#9a8777}
+.crumb-dot,.wave{color:#bd704b}
+.button-primary{background:#edbd72;color:#4a3022;box-shadow:0 4px 10px #b9743c20}
+.button-primary:hover{background:#e6ad5c}
+.stat{background:#fffaf4;border-color:#eadfd3}
+.stat-main{background:#f0e2d2;border-color:#f0e2d2}
+.stat-main .stat-number{color:#70452f}
+.stat-main .stat-icon,.stat-icon{color:#b66a47}
+.stat-time{background:#f7e9d9;border-color:#f7e9d9}
+.stat-time .stat-icon{color:#ad6847}
+.stat-foot{color:#958577}
+.trend{color:#728251}
+.now-card{background:radial-gradient(circle at 82% 25%,#a35d3d 0,#754932 32%,#493328 79%)}
+.now-label{color:#ead7c8}
+.now-label i{background:#edbd72;box-shadow:0 0 0 4px #edbd7223}
+.now-detail{color:#e0cdbd}
+.now-detail span{color:#b9977f}
+.call-card{background:#edbd72;color:#4a3022}
+.call-card:hover{background:#e6ad5c}
+.skip-card{border-color:#ffffff42;background:#ffffff0c;color:#fff8f1}
+.hero-ticket:before{background:#fff8ee;box-shadow:0 12px 36px #26180f38}
+.hero-ticket span{color:#927e6e}
+.hero-ticket b{color:#70452f}
+.hero-ticket i{color:#edbd72}
+.section-heading h2{color:#35271f}
+.section-note{color:#8f7d6d}
+.section-note i,.counter-light{background:#84905f}
+.counter-light{box-shadow:0 0 0 3px #edf0e2}
+.counter{background:#fffaf4;border-color:#eadfd3}
+.counter.busy{background:#f8f1e9}
+.counter-title{color:#928070}
+.counter.busy .counter-light{background:#be7858;box-shadow:0 0 0 3px #f3e5db}
+.counter-ticket{color:#70452f}
+.counter:not(.busy) .counter-ticket{color:#d2c5b6}
+.counter-state{color:#958576}
+.counter button{background:#f4e6ce;color:#876337}
+.counter.busy button{background:#f1e2d8;color:#9a583f}
+.panel{background:#fffaf4;border-color:#eadfd3}
+.panel-title h2{color:#3c2d23}
+.panel-title p{color:#978676}
+.live-mark{background:#eef0e4;color:#72804e}
+.live-mark i{background:#82905e}
+.queue-head{border-color:#eee5da;color:#9a8878}
+.queue-row{border-color:#f0e8df}
+.queue-no{color:#9b573b}
+.queue-name{color:#3e3027}
+.queue-service,.queue-time{color:#9a8878}
+.queue-wait{color:#896741;background:#f7ebd5}
+.activity-item{color:#65564b;border-color:#f0e8df}
+.activity-symbol{background:#f5e7d8;color:#a45f42}
+.activity-item:has(.activity-symbol:first-child) .activity-symbol{color:#6e7c4e}
+.activity-time{color:#a09081}
+.quick-tip{background:#f3e8d1;color:#716044}
+.tip-icon{background:#ead6b0;color:#8b6338}
+.quick-tip strong{color:#674c31}
+.view-links{background:#fffaf4;border-color:#eadfd3}
+.view-links a{color:#80533c;border-color:#f0e8df}
+.view-links a span{color:#b36c49}
+.sync-footer{color:#9e8e80}
+.sync-footer b{color:#bc7753}
+.kiosk{background:radial-gradient(circle at 10% 12%,#f2dfcc 0,transparent 31%),#f7f2eb}
+.kiosk-card{background:#fffaf4;border-color:#eadfd3;box-shadow:0 22px 70px #6b493117}
+.kiosk-card label,.dialog-heading+label,.dialog-heading~label{color:#594436}
+.kiosk-card select,.kiosk-card input,.dialog-heading~label input,.dialog-heading~label select{border-color:#e8dbcd;outline-color:#bf805c}
+.issued-no{color:#a45f42}
+.back-link{color:#917f70}
+.public-view{background:#f2e5d5;color:#463125}
+.public-view:before{background:#e9bd7b}
+.public-view:after{background:#ce8060}
+.public-inner{background:#fffaf4;border-color:#eadfd3;box-shadow:0 24px 70px #583d291b}
+.public-brand{color:#70452f}
+.public-kicker{color:#988170}
+.public-number{color:#a45f42}
+.public-desk{color:#49372a}
+.public-bottom{border-color:#eee5da}
+.public-bottom section{border-color:#eee5da}
+.public-bottom small{color:#968577}
+.public-queue span{background:#f3e8db;color:#85563d}
+.public-back{color:#735641}
+.dialog-heading h2{color:#3c2d23}
+dialog{background:#fffaf4;border-color:#eadfd3}
+dialog::backdrop{background:#34281f80}
+.toast{background:#52392a;box-shadow:0 6px 20px #33221630}
+@media(max-width:680px){.topbar{background:#fffaf4}.public-inner{padding:35px 15px}}
+
