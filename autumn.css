@@ -91,8 +91,13 @@ body{background:#f7f2eb;color:#35271f}
 .public-view:after{background:#ce8060}
 .public-inner{background:#fffaf4;border-color:#eadfd3;box-shadow:0 24px 70px #583d291b}
 .public-brand{color:#70452f}
+.public-audio{display:block;margin:14px auto -12px;border:1px solid #ead9c8;border-radius:999px;background:#f8efe4;color:#795138;padding:9px 14px;font:600 11px 'DM Sans',sans-serif;cursor:pointer;transition:background .18s,transform .18s}
+.public-audio:hover:not(:disabled){background:#f1dfca;transform:translateY(-1px)}
+.public-audio:focus-visible{outline:3px solid #d9a16d;outline-offset:3px}
+.public-audio:disabled{cursor:not-allowed;opacity:.7}
 .public-kicker{color:#988170}
 .public-number{color:#a45f42}
+.public-customer{margin-top:9px;color:#70452f;font:700 clamp(17px,3vw,25px) Manrope,sans-serif}
 .public-desk{color:#49372a}
 .public-bottom{border-color:#eee5da}
 .public-bottom section{border-color:#eee5da}
@@ -103,5 +108,5 @@ body{background:#f7f2eb;color:#35271f}
 dialog{background:#fffaf4;border-color:#eadfd3}
 dialog::backdrop{background:#34281f80}
 .toast{background:#52392a;box-shadow:0 6px 20px #33221630}
-@media(max-width:680px){.topbar{background:#fffaf4}.public-inner{padding:35px 15px}}
+@media(max-width:680px){.topbar{background:#fffaf4}.public-inner{padding:35px 15px}.public-audio{margin-top:13px;padding:8px 11px;font-size:10px}}
 
