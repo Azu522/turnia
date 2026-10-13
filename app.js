@@ -1,4 +1,5 @@
 const KEY = 'fila-turnos-v1';
+const SOUND_KEY = 'fila-turnos-audio-v1';
 const initial = {
   next: 26,
   served: 15,
@@ -27,13 +28,34 @@ const initial = {
 };
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || structuredClone(initial); } catch { return structuredClone(initial); } };
 let data = load();
-const save = () => { localStorage.setItem(KEY, JSON.stringify(data)); render(); };
+let activeCount = data.counters.filter(c => c.ticket).length;
+let soundEnabled = localStorage.getItem(SOUND_KEY) === 'true';
+let lastAnnouncementId = data.announcement?.id || null;
+const save = () => { activeCount = data.counters.filter(c => c.ticket).length; localStorage.setItem(KEY, JSON.stringify(data)); render(); };
 const timeNow = () => new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const route = new URLSearchParams(location.search).get('vista') || 'operacion';
-const activeCount = data.counters.filter(c => c.ticket).length;
 const screenLink = '?vista=pantalla';
 const kioskLink = '?vista=kiosco';
+
+function speak(text) {
+  if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return false;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-MX';
+  utterance.rate = 0.92;
+  utterance.pitch = 1;
+  const spanishVoice = window.speechSynthesis.getVoices().find(voice => /^es(-|_)(MX|US|ES)/i.test(voice.lang));
+  if (spanishVoice) utterance.voice = spanishVoice;
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function publishAnnouncement(text) {
+  data.announcement = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, text };
+  lastAnnouncementId = data.announcement.id;
+  save();
+}
 
 function render() {
   if (route === 'pantalla') return renderPublic();
@@ -97,8 +119,8 @@ function callNext(counterId) {
   data.current = { ticket: item.ticket, counter: counter.id, customer: item.customer, service: item.service };
   data.activity.unshift({ text: `${item.ticket} · Llamado a Mesa ${counter.id}`, time: timeNow() });
   data.activity = data.activity.slice(0, 12);
-  save();
-  toast(`${item.ticket}: favor de pasar a Mesa ${counter.id}`);
+  publishAnnouncement(`Atención, ${item.customer}. Tiene el turno ${item.ticket}. Favor de pasar a la mesa ${counter.id} para ${item.service}.`);
+  toast(`${item.customer}, turno ${item.ticket}: favor de pasar a Mesa ${counter.id}`);
 }
 function finish(counterId) {
   const counter = data.counters.find(c => c.id === counterId);
@@ -115,7 +137,21 @@ function openDialog() { document.getElementById('new-ticket-dialog').showModal()
 function renderPublic() {
   document.title = 'Turnia · Pantalla de sala';
   const current = data.current;
-  document.getElementById('app').innerHTML = `<a class="public-back" href="./">← Volver al panel</a><main class="public-view"><div class="public-inner"><div class="public-brand"><span class="brand-mark">↗</span> turnia.</div><div class="public-kicker">${current ? 'FAVOR DE PASAR A' : 'EN UN MOMENTO LLAMAREMOS AL SIGUIENTE TURNO'}</div><div class="public-number">${current ? escapeHtml(current.ticket) : '—'}</div><div class="public-desk">${current ? `Puesto ${current.counter}` : 'Gracias por su paciencia'}</div><div class="public-bottom"><section><b>${data.queue.length}</b><small>PERSONAS EN ESPERA</small></section><section><b>${activeCount}/${data.counters.length}</b><small>PUESTOS EN SERVICIO</small></section><section><b>${new Intl.DateTimeFormat('es-MX',{hour:'numeric',minute:'2-digit'}).format(new Date())}</b><small>HORA LOCAL</small></section></div><div class="public-queue">${data.queue.slice(0,5).map(q=>`<span>${escapeHtml(q.ticket)}</span>`).join('')}</div></div></main>`;
+  const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  document.getElementById('app').innerHTML = `<a class="public-back" href="./">← Volver al panel</a><main class="public-view"><div class="public-inner"><div class="public-brand"><span class="brand-mark">↗</span> turnia.</div><button class="public-audio" id="toggle-audio" ${supportsSpeech ? '' : 'disabled'} aria-pressed="${soundEnabled}">${supportsSpeech ? (soundEnabled ? '🔊 Avisos de voz activados' : '🔈 Activar avisos de voz') : 'Audio no disponible'}</button><div class="public-kicker">${current ? 'FAVOR DE PASAR A' : 'EN UN MOMENTO LLAMAREMOS AL SIGUIENTE TURNO'}</div><div class="public-number">${current ? escapeHtml(current.ticket) : '—'}</div><div class="public-customer">${current ? escapeHtml(current.customer || 'Cliente') : 'Estamos preparando el siguiente turno'}</div><div class="public-desk">${current ? `Favor de pasar al puesto ${current.counter}` : 'Gracias por su paciencia'}</div><div class="public-bottom"><section><b>${data.queue.length}</b><small>PERSONAS EN ESPERA</small></section><section><b>${activeCount}/${data.counters.length}</b><small>PUESTOS EN SERVICIO</small></section><section><b>${new Intl.DateTimeFormat('es-MX',{hour:'numeric',minute:'2-digit'}).format(new Date())}</b><small>HORA LOCAL</small></section></div><div class="public-queue">${data.queue.slice(0,5).map(q=>`<span>${escapeHtml(q.ticket)}</span>`).join('')}</div></div></main>`;
+  document.getElementById('toggle-audio').addEventListener('click', event => {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem(SOUND_KEY, String(soundEnabled));
+    if (soundEnabled) {
+      const message = current
+        ? `Avisos de voz activados. Turno ${current.ticket}, ${current.customer}. Favor de pasar al puesto ${current.counter}.`
+        : 'Avisos de voz activados. En un momento llamaremos al siguiente turno.';
+      speak(message);
+    } else if (supportsSpeech) {
+      window.speechSynthesis.cancel();
+    }
+    renderPublic();
+  });
 }
 function renderKiosk() {
   document.title = 'Turnia · Solicitar turno';
@@ -125,6 +161,7 @@ function renderKiosk() {
     const form = new FormData(event.currentTarget);
     const ticket = issueTicket(String(form.get('name')).trim(), String(form.get('service')));
     document.querySelector('.kiosk-card').innerHTML = `<div class="kiosk-logo"><span class="brand-mark">↗</span>turnia<span class="brand-period">.</span></div><div class="issued"><span class="eyebrow">TU TURNO</span><div class="issued-no">${escapeHtml(ticket)}</div><h1>¡Listo, ${escapeHtml(String(form.get('name')).trim())}!</h1><p>Te avisaremos en la pantalla cuando sea tu turno.</p><button class="button button-primary" id="another-ticket">Solicitar otro turno</button></div><a class="back-link" href="./">Volver al panel de atención</a>`;
+    speak(`Tu turno es ${ticket}. ${String(form.get('name')).trim()}, espera a que te llamemos.`);
     document.getElementById('another-ticket').onclick = renderKiosk;
   });
 }
@@ -137,6 +174,20 @@ document.getElementById('ticket-form').addEventListener('submit', event => {
   document.getElementById('new-ticket-dialog').close();
   toast('Turno agregado a la fila.');
 });
-window.addEventListener('storage', event => { if (event.key === KEY && event.newValue) { data=JSON.parse(event.newValue); render(); } });
+window.addEventListener('storage', event => {
+  if (event.key !== KEY || !event.newValue) return;
+  try {
+    const updated = JSON.parse(event.newValue);
+    activeCount = updated.counters.filter(counter => counter.ticket).length;
+    const announcement = updated.announcement;
+    const shouldAnnounce = route === 'pantalla' && soundEnabled && announcement?.id && announcement.id !== lastAnnouncementId;
+    data = updated;
+    lastAnnouncementId = announcement?.id || lastAnnouncementId;
+    render();
+    if (shouldAnnounce) speak(announcement.text);
+  } catch (error) {
+    console.error('No se pudo actualizar la fila de turnos.', error);
+  }
+});
 render();
 
