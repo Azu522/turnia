@@ -12,7 +12,7 @@ Abre `index.html` en un navegador o sirve esta carpeta con cualquier servidor es
 - Kiosco para solicitar turno: `/?vista=kiosco`
 - Pantalla de sala: `/?vista=pantalla`
 
-La pantalla de sala incluye avisos de voz en español: activa el audio desde esa pantalla y se anunciarán el nombre, el número de turno y el puesto cuando se llame a alguien. El kiosco también dice en voz alta el turno recién emitido.
+Los avisos de voz en español cubren el llamado y la finalización de turnos desde el panel y desde los puestos de atención. Al llamar, se anuncian el nombre, el número y el puesto; al finalizar, se confirma que el puesto quedó libre y, si hay otro turno llamado, se anuncia quién sigue. La pantalla de sala también puede anunciar los cambios cuando se activa el audio, y el kiosco dice el número al emitir un turno.
 
 Las vistas comparten datos entre pestañas del mismo navegador. La persistencia local es apropiada para una demostración o uso en un solo dispositivo; una operación multiusuario real requiere una base de datos y sincronización compartida.
 
