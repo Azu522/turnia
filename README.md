@@ -12,6 +12,8 @@ Abre `index.html` en un navegador o sirve esta carpeta con cualquier servidor es
 - Kiosco para solicitar turno: `/?vista=kiosco`
 - Pantalla de sala: `/?vista=pantalla`
 
+La pantalla de sala incluye avisos de voz en español: activa el audio desde esa pantalla y se anunciarán el nombre, el número de turno y el puesto cuando se llame a alguien. El kiosco también dice en voz alta el turno recién emitido.
+
 Las vistas comparten datos entre pestañas del mismo navegador. La persistencia local es apropiada para una demostración o uso en un solo dispositivo; una operación multiusuario real requiere una base de datos y sincronización compartida.
 
 ## Publicar en Vercel desde Git
